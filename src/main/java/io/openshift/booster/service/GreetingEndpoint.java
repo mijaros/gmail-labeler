@@ -22,11 +22,18 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
 
 @Path("/")
 @Component
 public class GreetingEndpoint {
     private final GreetingProperties properties;
+    public static List<User> users = new ArrayList<>(
+        Arrays.asList(new User("Ahoj", "Svete", "aSvete"), new User("Test1", "test2", "tt"))
+    );
 
     public GreetingEndpoint(GreetingProperties properties) {
         this.properties = properties;
@@ -38,5 +45,17 @@ public class GreetingEndpoint {
     public Greeting greeting(@QueryParam("name") @DefaultValue("World") String name) {
         String message = String.format(properties.getMessage(), name);
         return new Greeting(message);
+    }
+    
+    @GET
+    @Path("/test")
+    @Produces("application/json")
+    public User getUsers(@QueryParam("name") String name) {
+        Optional<User> u = users.stream().filter(x -> x.getName() == name).findFirst();
+        if (!u.isPresent()) {
+            return null;
+        }
+        
+        return u.get();
     }
 }
